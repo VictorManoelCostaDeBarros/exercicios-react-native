@@ -1,0 +1,81 @@
+import React, { Component } from 'react'
+import { Button, Text, TextInput, View } from 'react-native'
+import Estilo from '../estilo'
+
+import MegaNumero from './MegaNumero'
+
+export default class Mega extends Component {
+
+    state = {
+        quantNumeros: this.props.quantNumeros,
+        numeros: []
+    }
+
+    alterarQuantNumero = (quant) => {
+        this.setState({ quantNumeros: +quant })
+    }
+
+    gerarNumeroNaoContido = nums => {
+        const novo = parseInt(Math.random() * 60) + 1
+        return nums.includes(novo) ? this.gerarNumeroNaoContido(nums) : novo
+    }
+
+    gerarNumeros = () => {
+        const numeros = Array(this.state.quantNumeros)
+            .fill()
+            .reduce(n => [...n, this.gerarNumeroNaoContido(n)], [])
+            .sort((a, b) => a - b)
+        this.setState({ numeros })
+    }
+
+    // Outra forma de fazer a função
+    // gerarNumeros = () => {
+    //     const { quantNumeros } = this.state
+    //     const numeros = []
+
+    //     for (let i = 0; i < quantNumeros; i++) {
+    //         const n = this.gerarNumeroNaoContido(numeros)
+    //         numeros.push(n)
+    //     }
+
+    //     numeros.sort((a, b) => a - b)
+
+    //     this.setState({ numeros })
+    // }
+
+    exibirNumeros = () => {
+        const nums = this.state.numeros
+        return nums.map(num => {
+            return <MegaNumero key={num} num={num} />
+        })
+    }
+
+    render() {
+        return (
+            <>
+                <Text style={Estilo.text}>
+                   Gerador de Mega-Sena 
+                </Text>
+                <TextInput 
+                    keyboardType={'numeric'}
+                    style={{borderBottomWidth: 1}}
+                    placeholder="Quantidade de numeros"
+                    value={`${this.state.quantNumeros}`}
+                    onChangeText={this.alterarQuantNumero}
+                />
+                <Button 
+                    title="Gerar"
+                    onPress={this.gerarNumeros}
+                />
+                <View style={{
+                    flexDirection: 'row',
+                    flexWrap: 'wrap', 
+                    justifyContent: 'center',
+                    marginTop: 20
+                }}>
+                    {this.exibirNumeros()}
+                </View>
+            </>
+        )
+    }
+}
